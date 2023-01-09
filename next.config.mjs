@@ -13,5 +13,15 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    domains: [
+      "tailwindui.com",
+      "cdn.discordapp.com",
+      "avatars.githubusercontent.com",
+      "media.licdn.com",
+      "lh3.googleusercontent.com",
+      "platform-lookaside.fbsbx.com",
+    ],
+  },
 };
 export default config;
