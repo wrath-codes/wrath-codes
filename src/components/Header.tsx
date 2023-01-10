@@ -242,7 +242,7 @@ const LoginMobile = () => {
         </div>
       )
         : (
-          <div className="rounded-md bg-violet-500 px-10 py-3 font-semibold text-white no-underline transition hover:bg-violet-900 text-center cursor-pointer max-w-xs mx-auto"
+          <div className="rounded-md bg-violet-500 px-10 py-3 font-semibold text-white no-underline transition hover:bg-violet-900 text-center cursor-pointer mx-auto"
             onClick={() => signIn()}
           >
             Sign In
