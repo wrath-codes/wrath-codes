@@ -1,6 +1,6 @@
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
-import { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import { inferRouterInputs } from "@trpc/server";
 import superjson from "superjson";
 
 import { AppRouter } from "../server/trpc/router/_app";
@@ -10,6 +10,7 @@ const getBaseUrl = () => {
   if (process.env.VERCEL_URL) return `https://${ process.env.VERCEL_URL }`; // SSR should use vercel url
   return `http://localhost:${ process.env.PORT ?? 3000 }`; // dev SSR should use localhost
 };
+
 
 export const trpc = createTRPCNext<AppRouter>({
   config({ ctx }) {
@@ -34,6 +35,12 @@ export const trpc = createTRPCNext<AppRouter>({
         }),
         httpBatchLink({
           url: `${ getBaseUrl() }/api/trpc`,
+          fetch(url, opts) {
+            return fetch(url, {
+              ...opts,
+              credentials: "include",
+            });
+          },
           headers() {
             if (ctx?.req) {
               // To use SSR properly, you need to forward the client's headers to the server
@@ -53,7 +60,6 @@ export const trpc = createTRPCNext<AppRouter>({
             return {};
           },
         }),
-
       ],
     };
   },
@@ -65,8 +71,3 @@ export const trpc = createTRPCNext<AppRouter>({
  * @example type HelloInput = RouterInputs['example']['hello']
  **/
 export type RouterInputs = inferRouterInputs<AppRouter>;
-/**
- * Inference helper for outputs
- * @example type HelloOutput = RouterOutputs['example']['hello']
- **/
-export type RouterOutputs = inferRouterOutputs<AppRouter>;

@@ -48,10 +48,7 @@ export default function Header() {
                   </label>
                   <div className="relative">
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                      <MagnifyingGlassIcon
-                        className="mr-2 h-5 w-5 text-violet-400"
-                        aria-hidden="true"
-                      />
+                      <MagnifyingGlassIcon className="mr-2 h-5 w-5 text-violet-400" aria-hidden="true" />
                     </div>
                     <input
                       placeholder="Search"
@@ -68,15 +65,9 @@ export default function Header() {
                 <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
-                    <XMarkIcon
-                      className="block h-6 w-6 text-violet-500"
-                      aria-hidden="true"
-                    />
+                    <XMarkIcon className="block h-6 w-6 text-violet-500" aria-hidden="true" />
                   ) : (
-                    <Bars3Icon
-                      className="block h-6 w-6 text-violet-500"
-                      aria-hidden="true"
-                    />
+                    <Bars3Icon className="block h-6 w-6 text-violet-500" aria-hidden="true" />
                   )}
                 </Disclosure.Button>
               </div>
@@ -85,16 +76,16 @@ export default function Header() {
                 <Login />
               </div>
             </div>
-            <nav className="hidden lg:flex lg:space-x-32 lp:py-2 justify-center" aria-label="Global">
+            <nav className="lp:py-2 hidden justify-center lg:flex lg:space-x-32" aria-label="Global">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={classNames(
                     isActive === item.href
-                      ? 'bg-violet-100 text-violet-500 border-violet-900 mt-2'
-                      : 'mt-2 text-gray-400 hover:bg-violet-50 hover:text-violet-400',
-                    'block rounded-md py-1 px-3 text-base font-medium'
+                      ? "mt-2 border-violet-900 bg-violet-100 text-violet-500"
+                      : "mt-2 text-gray-400 hover:bg-violet-50 hover:text-violet-400",
+                    "block rounded-md py-1 px-3 text-base font-medium"
                   )}
                   aria-current={item.current ? "page" : undefined}
                 >
@@ -112,12 +103,11 @@ export default function Header() {
                   href={item.href}
                   className={classNames(
                     isActive === item.href
-                      ? 'bg-violet-100 text-violet-500 border-violet-900 mt-2'
-                      : 'mt-2 text-gray-400 hover:bg-gray-200 hover:text-violet-300',
-                    'block rounded-md py-2 px-3 text-base font-medium'
+                      ? "mt-2 border-violet-900 bg-violet-100 text-violet-500"
+                      : "mt-2 text-gray-400 hover:bg-gray-200 hover:text-violet-300",
+                    "block rounded-md py-2 px-3 text-base font-medium"
                   )}
-
-                  aria-current={item.current ? 'page' : undefined}
+                  aria-current={item.current ? "page" : undefined}
                 >
                   {item.name}
                 </Disclosure.Button>
@@ -131,7 +121,6 @@ export default function Header() {
   );
 }
 
-
 const Login = () => {
   const { data: sessionData } = useSession();
 
@@ -142,7 +131,6 @@ const Login = () => {
 
   return (
     <>
-
       {sessionData ? (
         <>
           <button className="flex-shrink-0 rounded-full bg-transparent p-1 text-violet-500 hover:text-violet-900 focus:outline-none focus:ring-violet-500 focus:ring-offset-violet-900">
@@ -172,14 +160,13 @@ const Login = () => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 w-48 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-violet-500 ring-opacity-5 focus:outline-none text-center">
+              <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right divide-y divide-gray-100 rounded-md bg-white text-center shadow-lg ring-1 ring-violet-500 ring-opacity-5 focus:outline-none">
                 <div className="px-1 py-1 ">
                   <Menu.Item>
                     <p className="text-center text-2xl text-violet-500">
                       {sessionData && <span>{sessionData.user?.name}</span>}
                       {secretMessage && <span> - {secretMessage}</span>}
                     </p>
-
                   </Menu.Item>
                   <Menu.Item>
                     <button
@@ -195,14 +182,14 @@ const Login = () => {
           </Menu>
         </>
       ) : (
-        <div className="cursor-pointer rounded-md bg-violet-500 px-2 py-1 font-semibold text-white no-underline transition hover:bg-violet-900 ml-4"
+        <div
+          className="ml-4 cursor-pointer rounded-md bg-violet-500 px-2 py-1 font-semibold text-white no-underline transition hover:bg-violet-900"
           onClick={() => signIn()}
         >
           Sign In
         </div>
       )}
     </>
-
   );
 };
 
@@ -212,26 +199,35 @@ const LoginMobile = () => {
   return (
     <>
       {sessionData ? (
-        <div className="flex items-center flex-col w-full px-2 pt-2 pb-3 space-y-1">
-          <div className="border-t border-gray-700 pt-4 pb-3 w-full">
+        <div className="flex w-full flex-col items-center space-y-1 px-2 pt-2 pb-3">
+          <div className="w-full border-t border-gray-700 pt-4 pb-3">
             <div className="flex items-center px-4">
               <div className="flex-shrink-0">
-                <img className="h-10 w-10 rounded-full" src={useSession()?.data?.user?.image || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"} alt="" />
+                <Image
+                  className="h-10 w-10 rounded-full"
+                  src={
+                    useSession()?.data?.user?.image ||
+                    "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+                  }
+                  alt=""
+                />
               </div>
               <div className="ml-3 flex text-center">
-                <div className="text-base font-medium text-center text-violet-500">{useSession().data?.user?.name}</div>
+                <div className="text-center text-base font-medium text-violet-500">
+                  {useSession()?.data?.user?.name}
+                </div>
               </div>
               <button
                 type="button"
-                className="ml-auto flex-shrink-0 rounded-full bg-transparent p-1 text-violet-500 hover:text-violet-800 focus:outline-none focus:ring-2 focus:ring-violet focus:ring-offset-2 focus:ring-offset-gray-800"
+                className="focus:ring-violet ml-auto flex-shrink-0 rounded-full bg-transparent p-1 text-violet-500 hover:text-violet-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800"
               >
                 <span className="sr-only">View notifications</span>
                 <BellIcon className="h-6 w-6" aria-hidden="true" />
               </button>
             </div>
-            <div className="text-sm text-center font-medium text-gray-400">{useSession()?.data?.user?.email}</div>
+            <div className="text-center text-sm font-medium text-gray-400">{useSession()?.data?.user?.email}</div>
           </div>
-          <div className="mt-3 px-2 space-y-1">
+          <div className="mt-3 space-y-1 px-2">
             <button
               className="rounded-md bg-violet-500 px-10 py-3 font-semibold text-white no-underline transition hover:bg-violet-900"
               onClick={() => signOut()}
@@ -240,15 +236,14 @@ const LoginMobile = () => {
             </button>
           </div>
         </div>
-      )
-        : (
-          <div className="rounded-md bg-violet-500 px-10 py-3 font-semibold text-white no-underline transition hover:bg-violet-900 text-center cursor-pointer mx-auto"
-            onClick={() => signIn()}
-          >
-            Sign In
-          </div>
-        )
-      }
+      ) : (
+        <div
+          className="mx-auto cursor-pointer rounded-md bg-violet-500 px-10 py-3 text-center font-semibold text-white no-underline transition hover:bg-violet-900"
+          onClick={() => signIn()}
+        >
+          Sign In
+        </div>
+      )}
     </>
   );
 };

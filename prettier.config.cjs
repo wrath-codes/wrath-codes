@@ -11,5 +11,5 @@ module.exports = {
   bracketSpacing: true,
   jsxBracketSameLine: false,
   importOrder: ["^\\u0000"],
-  plugins: [require.resolve("prettier-plugin-tailwindcss")],
+  plugins: [require("prettier-plugin-tailwindcss")],
 };

@@ -6,7 +6,6 @@ import { trpc } from "../utils/trpc";
 
 import type { NextPage } from "next";
 
-
 const Blog: NextPage = (props) => {
   const articles: IArticle[] = trpc.devto.getWrathArticles.useQuery().data;
   return (
@@ -18,24 +17,17 @@ const Blog: NextPage = (props) => {
       </Head>
       <Header />
       <main className="flex min-h-screen flex-col items-center bg-gradient-to-b from-white to-gray-200">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 mt-12">
-          <h2 className="text-5xl font-extrabold tracking-tight text-violet-500 sm:text-[3rem]">
-            Blog
-          </h2>
-          <div className="flex flex-row justify-between items-center w-full max-w-3xl">
-            <div className="text-md text-violet-500 bg-violet-100 rounded-md px-2 py-1">
-              Articles
-            </div>
-            <div className="text-md text-violet-500 bg-violet-100 rounded-md px-2 py-1">
-              {articles?.length}
-            </div>
+        <div className="container mt-12 flex flex-col items-center justify-center gap-12 px-4">
+          <h2 className="text-5xl font-extrabold tracking-tight text-violet-500 sm:text-[3rem]">Blog</h2>
+          <div className="flex w-full max-w-3xl flex-row items-center justify-between">
+            <div className="text-md rounded-md bg-violet-100 px-2 py-1 text-violet-500">Articles</div>
+            <div className="text-md rounded-md bg-violet-100 px-2 py-1 text-violet-500">{articles?.length}</div>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:gap-8">
             {articles?.map((article: IArticle) => (
               <Article key={article.id} {...article} />
             ))}
           </div>
-
         </div>
       </main>
     </>
@@ -43,7 +35,6 @@ const Blog: NextPage = (props) => {
 };
 
 export default Blog;
-
 
 interface IArticle {
   id: number;
@@ -57,14 +48,14 @@ interface IArticle {
 const Article = ({ title, url, description, tag_list, readable_publish_date }: IArticle) => {
   return (
     <Link
-      className="flex max-w-3xl flex-col gap-4 rounded-xl bg-transparent p-4  hover:bg-violet-500/20 border-2 hover:border-violet-500 group transition-all duration-200 ease-in-out"
+      className="group flex max-w-3xl flex-col gap-4 rounded-xl border-2  bg-transparent p-4 transition-all duration-200 ease-in-out hover:border-violet-500 hover:bg-violet-500/20"
       href={url}
       target="_blank"
     >
-      <h3 className="text-2xl text-violet-300 font-bold group-hover:text-violet-900 transition-all duration-200 ease-in-out">
+      <h3 className="text-2xl font-bold text-violet-300 transition-all duration-200 ease-in-out group-hover:text-violet-900">
         {title}
       </h3>
-      <div className="text-lg text-gray-500 group-hover:text-gray-900 transition-all duration-200 ease-in-out">
+      <div className="text-lg text-gray-500 transition-all duration-200 ease-in-out group-hover:text-gray-900">
         {description}
       </div>
 
@@ -72,17 +63,17 @@ const Article = ({ title, url, description, tag_list, readable_publish_date }: I
         <div className="flex flex-wrap gap-2">
           {/*Tags for the Article*/}
           {tag_list.map((tag) => (
-            <span className="text-sm text-violet-300 bg-violet-50 rounded-md px-2 py-1 border-2 border-violet-200 group-hover:text-violet-500 group-hover:border-violet-400 transition-all duration-200 ease-in-out">
+            // eslint-disable-next-line react/jsx-key
+            <span className="rounded-md border-2 border-violet-200 bg-violet-50 px-2 py-1 text-sm text-violet-300 transition-all duration-200 ease-in-out group-hover:border-violet-400 group-hover:text-violet-500">
               {tag}
             </span>
           ))}
         </div>
         {/*Published Date*/}
-        <div className="text-sm text-violet-300 group-hover:text-violet-500 transition-all duration-200 ease-in-out">
+        <div className="text-sm text-violet-300 transition-all duration-200 ease-in-out group-hover:text-violet-500">
           {readable_publish_date}
         </div>
       </div>
     </Link>
-  )
+  );
 };
-

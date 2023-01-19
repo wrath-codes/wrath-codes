@@ -1,12 +1,20 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { useCallback } from "react";
+import { useForm } from "react-hook-form";
 
+import { createMessageSchema } from "../common/validation/message";
 import Header from "../components/Header";
 
+import type { InferGetServerSidePropsType, NextPage } from "next";
+import type { ICreateMessage } from "../common/validation/message";
 
-import type { NextPage } from "next";
+export const getServerSideProps = async () => {
+  return { props: {} };
+};
 
-
-const Contact: NextPage = (props) => {
+const Contact: NextPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <>
       <Head>
@@ -16,11 +24,9 @@ const Contact: NextPage = (props) => {
       </Head>
       <Header />
       <main className="flex min-h-screen flex-col items-center bg-gradient-to-b from-white to-gray-200">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 mt-12">
-          <h2 className="text-5xl font-extrabold tracking-tight text-violet-500 sm:text-[3rem]">
-            Contact
-          </h2>
-          <div className="flex flex-row justify-center items-center w-full ">
+        <div className="container mt-12 flex flex-col items-center justify-center gap-12 px-4">
+          <h2 className="text-5xl font-extrabold tracking-tight text-violet-500 sm:text-[3rem]">Contact</h2>
+          <div className="flex w-full flex-row items-center justify-center ">
             <ContactForm />
           </div>
         </div>
@@ -33,10 +39,44 @@ export default Contact;
 
 // Contact Form
 const ContactForm = () => {
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ICreateMessage>({
+    resolver: zodResolver(createMessageSchema),
+  });
+
+  const onSubmit = useCallback(
+    async (data: ICreateMessage) => {
+      const result = await fetch("/api/cors", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const response = await result.json();
+      console.log(response);
+
+      if (response.status === "success") {
+        router.push("/");
+      }
+    },
+    [router]
+  );
+
   return (
-    <div className="py-10 px-6 sm:px-5 lg:col-span-2 xl:p-12 w-full max-w-3xl">
-      <h3 className="text-lg text-violet-500 font-bold text-center">Send me a message</h3>
-      <form action="#" method="POST" className="mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
+    <div className="w-full max-w-3xl py-10 px-6 sm:px-5 lg:col-span-2 xl:p-12">
+      <h3 className="text-center text-lg font-bold text-violet-500">Send me a message</h3>
+      <form
+        action="#"
+        method="POST"
+        className="mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <div>
           <label htmlFor="first-name" className="block text-sm font-semibold text-violet-500">
             First name
@@ -44,12 +84,12 @@ const ContactForm = () => {
           <div className="mt-1">
             <input
               type="text"
-              name="first-name"
-              id="first-name"
               autoComplete="given-name"
               className="block w-full cursor-pointer rounded-md border border-transparent bg-gray-50 py-2 pl-2 pr-3 text-sm placeholder-gray-400 focus:border-violet-500 focus:bg-violet-100 focus:text-gray-900 focus:placeholder-gray-500 focus:outline-none focus:ring-violet-500 sm:text-sm"
+              {...register("firstName")}
             />
           </div>
+          <p className="text-sm text-red-400">{errors.firstName?.message}</p>
         </div>
         <div>
           <label htmlFor="last-name" className="block text-sm font-semibold text-violet-500">
@@ -58,12 +98,12 @@ const ContactForm = () => {
           <div className="mt-1">
             <input
               type="text"
-              name="last-name"
-              id="last-name"
               autoComplete="family-name"
               className="block w-full cursor-pointer rounded-md border border-transparent bg-gray-50 py-2 pl-2 pr-3 text-sm placeholder-gray-400 focus:border-violet-500 focus:bg-violet-100 focus:text-gray-900 focus:placeholder-gray-500 focus:outline-none focus:ring-violet-500 sm:text-sm"
+              {...register("lastName")}
             />
           </div>
+          <p className="text-sm text-red-400">{errors.lastName?.message}</p>
         </div>
         <div>
           <label htmlFor="email" className="block text-sm font-semibold text-violet-500">
@@ -71,33 +111,30 @@ const ContactForm = () => {
           </label>
           <div className="mt-1">
             <input
-              id="email"
-              name="email"
               type="email"
               autoComplete="email"
               className="block w-full cursor-pointer rounded-md border border-transparent bg-gray-50 py-2 pl-2 pr-3 text-sm placeholder-gray-400 focus:border-violet-500 focus:bg-violet-100 focus:text-gray-900 focus:placeholder-gray-500 focus:outline-none focus:ring-violet-500 sm:text-sm"
+              {...register("email")}
             />
           </div>
+          <p className="text-sm text-red-400">{errors.email?.message}</p>
         </div>
         <div>
           <div className="flex justify-between">
             <label htmlFor="phone" className="block text-sm font-semibold text-violet-500">
               Phone
             </label>
-            <span id="phone-optional" className="text-sm text-gray-500">
-              Optional
-            </span>
           </div>
           <div className="mt-1">
             <input
               type="text"
-              name="phone"
-              id="phone"
               autoComplete="tel"
               className="block w-full cursor-pointer rounded-md border border-transparent bg-gray-50 py-2 pl-2 pr-3 text-sm placeholder-gray-400 focus:border-violet-500 focus:bg-violet-100 focus:text-gray-900 focus:placeholder-gray-500 focus:outline-none focus:ring-violet-500 sm:text-sm"
               aria-describedby="phone-optional"
+              {...register("phone")}
             />
           </div>
+          <p className="text-sm text-red-400">{errors.phone?.message}</p>
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="subject" className="block text-sm font-semibold text-violet-500">
@@ -106,11 +143,11 @@ const ContactForm = () => {
           <div className="mt-1">
             <input
               type="text"
-              name="subject"
-              id="subject"
               className="block w-full cursor-pointer rounded-md border border-transparent bg-gray-50 py-2 pl-2 pr-3 text-sm placeholder-gray-400 focus:border-violet-500 focus:bg-violet-100 focus:text-gray-900 focus:placeholder-gray-500 focus:outline-none focus:ring-violet-500 sm:text-sm"
+              {...register("subject")}
             />
           </div>
+          <p className="text-sm text-red-400">{errors.subject?.message}</p>
         </div>
         <div className="sm:col-span-2">
           <div className="flex justify-between">
@@ -120,19 +157,19 @@ const ContactForm = () => {
           </div>
           <div className="mt-1">
             <textarea
-              id="message"
-              name="message"
               rows={4}
               className="block w-full cursor-pointer rounded-md border border-transparent bg-gray-50 py-2 pl-2 pr-3 text-sm placeholder-gray-400 focus:border-violet-500 focus:bg-violet-100 focus:text-gray-900 focus:placeholder-gray-500 focus:outline-none focus:ring-violet-500 sm:text-sm"
               aria-describedby="message-max"
-              defaultValue={''}
+              defaultValue={""}
+              {...register("message")}
             />
           </div>
+          <p className="text-sm text-red-400">{errors.message?.message}</p>
         </div>
         <div className="sm:col-span-2 sm:flex sm:justify-end">
           <button
             type="submit"
-            className="rounded-md bg-violet-500 px-10 py-3 font-semibold text-white no-underline transition hover:bg-violet-900 text-center cursor-pointer max-w-xs mx-auto"
+            className="mx-auto max-w-xs cursor-pointer rounded-md bg-violet-500 px-10 py-3 text-center font-semibold text-white no-underline transition hover:bg-violet-900"
           >
             Submit
           </button>
@@ -140,4 +177,4 @@ const ContactForm = () => {
       </form>
     </div>
   );
-}
+};

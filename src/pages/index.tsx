@@ -4,12 +4,9 @@ import Link from "next/link";
 
 import sideLogo from "../../public/wrathCodes_side_logo.svg";
 import Header from "../components/Header";
-import { trpc } from "../utils/trpc";
 
 import type { NextPage } from "next";
 const Home: NextPage = (props) => {
-  const hello = trpc.example.hello.useQuery({ text: "from tRPC" });
-
   return (
     <>
       <Head>
@@ -30,11 +27,7 @@ const Home: NextPage = (props) => {
               href="/about"
               description="Just the gist of what you need to know before you go any further into the rabbit hole."
             />
-            <Card
-              title="Blog"
-              href="/blog"
-              description="A collection of articles I've written on various topics."
-            />
+            <Card title="Blog" href="/blog" description="A collection of articles I've written on various topics." />
             <Card
               title="Story"
               href="/story"
@@ -49,7 +42,6 @@ const Home: NextPage = (props) => {
 
 export default Home;
 
-
 interface ICard {
   title: string;
   href: string;
@@ -59,15 +51,13 @@ interface ICard {
 const Card = ({ title, href, description }: ICard) => {
   return (
     <Link
-      className="flex max-w-xs flex-col gap-4 rounded-xl bg-transparent p-4  hover:bg-violet-500/20 border-2 hover:border-violet-500 group transition-all duration-200 ease-in-out"
+      className="group flex max-w-xs flex-col gap-4 rounded-xl border-2  bg-transparent p-4 transition-all duration-200 ease-in-out hover:border-violet-500 hover:bg-violet-500/20"
       href={href}
     >
-      <h3 className="text-2xl font-bold group-hover:text-violet-900 transition-all duration-200 ease-in-out">
+      <h3 className="text-2xl font-bold transition-all duration-200 ease-in-out group-hover:text-violet-900">
         {title}
       </h3>
-      <div className="text-lg">
-        {description}
-      </div>
+      <div className="text-lg">{description}</div>
     </Link>
-  )
+  );
 };
