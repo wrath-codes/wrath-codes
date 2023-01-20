@@ -4,18 +4,24 @@ import { createTodoSchema, modifyTodoSchema, updateTodoSchema } from "./../../..
 export const todoRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const todos = await ctx.prisma.todo.findMany({
-      select: {
-        author: { select: { name: true } },
+      include: {
+        author: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
     return todos;
   }),
+
   getUsers: protectedProcedure.query(async ({ ctx }) => {
     const todos = await ctx.prisma.todo.findMany({
       where: { authorId: ctx.session?.user?.id },
     });
     return todos;
   }),
+
   create: protectedProcedure.input(createTodoSchema).mutation(async ({ ctx, input }) => {
     const { prisma, session } = ctx;
     const todo = await prisma.todo.create({
@@ -26,6 +32,7 @@ export const todoRouter = router({
     });
     return todo;
   }),
+
   toggleCompleted: protectedProcedure.input(modifyTodoSchema).mutation(async ({ ctx, input }) => {
     const { prisma } = ctx;
     const todo = await prisma.todo.update({
@@ -36,6 +43,7 @@ export const todoRouter = router({
     });
     return todo;
   }),
+
   toggleUncompleted: protectedProcedure.input(modifyTodoSchema).mutation(async ({ ctx, input }) => {
     const { prisma } = ctx;
     const todo = await prisma.todo.update({
@@ -46,6 +54,7 @@ export const todoRouter = router({
     });
     return todo;
   }),
+
   delete: protectedProcedure.input(modifyTodoSchema).mutation(async ({ ctx, input }) => {
     const { prisma } = ctx;
     const todo = await prisma.todo.delete({
@@ -53,6 +62,7 @@ export const todoRouter = router({
     });
     return todo;
   }),
+
   updateTitle: protectedProcedure.input(updateTodoSchema).mutation(async ({ ctx, input }) => {
     const { prisma } = ctx;
     const todo = await prisma.todo.update({

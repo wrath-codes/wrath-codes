@@ -1,10 +1,13 @@
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import Head from "next/head";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 
 import Header from "../../components/Header";
+import { trpc } from "../../utils/trpc";
 
 import type { NextPage } from "next";
-const todos = [
+/* const todos = [
   {
     id: 1,
     title: "Learn Next.js",
@@ -25,10 +28,10 @@ const todos = [
       name: "wrathCodes",
     },
   },
-];
+]; */
 
 const TodoApp: NextPage = (props) => {
-  // const todos = trpc.todo.getAll.useQuery();
+  const todos = trpc.todo.getAll.useQuery();
 
   return (
     <>
@@ -41,10 +44,21 @@ const TodoApp: NextPage = (props) => {
       <main className="flex min-h-screen flex-col items-center bg-gradient-to-b from-white to-gray-200">
         <div className="container mt-12 flex flex-col items-center justify-center gap-12 px-4">
           <h2 className="text-5xl font-extrabold tracking-tight text-violet-500 sm:text-[3rem]">Todo App</h2>
-
+          <div className="flex flex-row gap-3 text-center">
+            <button className=" rounded-md bg-violet-500 px-4 py-2  text-xl font-medium text-white transition hover:scale-110 hover:bg-violet-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+              <FaPlus />
+            </button>
+          </div>
           <div className="flex w-7/12 flex-col items-center justify-center gap-4">
-            {todos.map((todo) => (
-              <Todo key={todo.id} {...todo} />
+            {todos?.data?.map((todo) => (
+              <Todo
+                key={todo.id}
+                id={Number(todo.id)}
+                title={todo.title}
+                name={todo?.author?.name || "Anônimo"}
+                createdAt={todo.updatedAt || todo.createdAt}
+                completed={todo.completed}
+              />
             ))}
           </div>
         </div>
@@ -59,30 +73,28 @@ interface ITodo {
   id: number;
   title: string;
   completed: boolean;
-  createdAt: string;
-  updatedAt: string;
-  author: {
-    name: string;
-  };
+  createdAt: Date;
+  name: string;
 }
 
-const Todo = ({ title, author, id }: ITodo) => {
+const Todo = ({ title, name, id, createdAt, completed }: ITodo) => {
+  const convertedDate = format(new Date(createdAt), "dd 'de' LLLL 'as' HH:mm'h'", { locale: ptBR });
   return (
     <div className="grid min-w-full grid-cols-1 gap-4 rounded-md bg-white p-4 shadow-md">
       <div className="flex flex-row items-center justify-between ">
         <div className="flex flex-row items-center">
           <input
             type="checkbox"
-            id={`checkbox${ id }`}
-            className="after:bg-[width:40px] peer relative
+            id={`checkbox${id}`}
+            className={`after:bg-[width:40px] peer relative
           mr-2 h-5 w-5 appearance-none rounded-sm border after:absolute after:top-0 after:left-0 after:h-full after:w-full after:rounded-sm
           after:bg-white
           after:bg-check-box after:bg-[length:40px] after:bg-center after:bg-no-repeat 
           after:opacity-0 after:shadow-md after:content-[''] checked:border-transparent checked:bg-violet-500 
-          hover:ring hover:ring-violet-600 focus:outline-none"
+          hover:ring hover:ring-violet-600 focus:outline-none ${completed ? "checked:after:opacity-100" : ""}`}
           />
           <label
-            htmlFor={`checkbox${ id }`}
+            htmlFor={`checkbox${id}`}
             className="w-full cursor-pointer font-medium text-violet-500 peer-checked:text-gray-500/70 peer-checked:line-through"
           >
             <h3 className="text-2xl font-bold">{title}</h3>
@@ -97,7 +109,12 @@ const Todo = ({ title, author, id }: ITodo) => {
           </button>
         </div>
       </div>
-      <p className="text-end text-gray-500">{author.name}</p>
+      <div className="flex flex-row justify-between">
+        <div>
+          <p className="font-sm text-violet-700">{convertedDate}</p>
+        </div>
+        <p className="text-gray-500">{name}</p>
+      </div>
     </div>
   );
 };
