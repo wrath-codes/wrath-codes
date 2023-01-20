@@ -49,6 +49,7 @@ const TodoApp: NextPage = (props) => {
               <FaPlus />
             </button>
           </div>
+          <div>hello</div>
           <div className="flex w-7/12 flex-col items-center justify-center gap-4">
             {todos?.data?.map((todo) => (
               <Todo
