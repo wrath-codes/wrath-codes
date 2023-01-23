@@ -48,7 +48,6 @@ const TodoApp: NextPage = (props) => {
             <button className=" rounded-md bg-violet-500 px-4 py-2  text-xl font-medium text-white transition hover:scale-110 hover:bg-violet-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
               <FaPlus />
             </button>
-            <div>hello</div>
           </div>
           <div className="flex w-7/12 flex-col items-center justify-center gap-4">
             {todos?.data?.map((todo) => (
