@@ -1,12 +1,28 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@fontsource/geist-sans/400.css";
+@import "@fontsource/geist-sans/500.css";
+@import "@fontsource/geist-sans/600.css";
+@import "@fontsource/geist-sans/700.css";
+@import "@fontsource/geist-mono/400.css";
+@import "@fontsource/geist-mono/500.css";
+@import "@fontsource/geist-mono/600.css";
+
+@font-face {
+	font-family: "Symbols Nerd Font";
+	src: url("/fonts/SymbolsNerdFontMono-Regular.ttf") format("truetype");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *));
 
 /* Catppuccin Mocha Theme */
 :root {
-	--font-sans: "Inter", system-ui, sans-serif;
-	--font-mono: "JetBrains Mono", ui-monospace, monospace;
+	--font-sans: "Geist Sans", system-ui, sans-serif;
+	--font-mono: "Geist Mono", ui-monospace, monospace;
+	--font-icons: "Symbols Nerd Font";
 
 	--radius: 0.5rem;
 
@@ -111,5 +127,7 @@
 	pre,
 	kbd {
 		font-family: var(--font-mono);
+		font-variant-ligatures: common-ligatures;
+		font-feature-settings: "liga" 1, "calt" 1;
 	}
 }
