@@ -1,0 +1,55 @@
+@import "tailwindcss";
+@import "./lib/styles/catppuccin.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+	--font-sans: "Inter", system-ui, sans-serif;
+	--font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+	--background: var(--ctp-base);
+	--foreground: var(--ctp-text);
+
+	--card: var(--ctp-surface0);
+	--card-foreground: var(--ctp-text);
+
+	--popover: var(--ctp-surface0);
+	--popover-foreground: var(--ctp-text);
+
+	--primary: var(--ctp-mauve);
+	--primary-foreground: var(--ctp-base);
+
+	--secondary: var(--ctp-surface1);
+	--secondary-foreground: var(--ctp-text);
+
+	--muted: var(--ctp-surface0);
+	--muted-foreground: var(--ctp-subtext0);
+
+	--accent: var(--ctp-pink);
+	--accent-foreground: var(--ctp-base);
+
+	--destructive: var(--ctp-red);
+	--destructive-foreground: var(--ctp-base);
+
+	--border: var(--ctp-surface1);
+	--input: var(--ctp-surface1);
+	--ring: var(--ctp-mauve);
+
+	--radius: 0.5rem;
+}
+
+html {
+	background-color: var(--background);
+	color: var(--foreground);
+	font-family: var(--font-sans);
+}
+
+body {
+	min-height: 100vh;
+}
+
+code,
+pre,
+kbd {
+	font-family: var(--font-mono);
+}

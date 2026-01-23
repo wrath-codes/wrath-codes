@@ -1,0 +1,35 @@
+# Project-specific
+AGENTS.md
+tasks/
+
+# Dependencies
+node_modules/
+
+# Build
+.svelte-kit/
+build/
+dist/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Bun
+bun.lockb
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+coverage/
