@@ -11,9 +11,19 @@ let { class: className, children }: Props = $props()
 </script>
 
 <div
-	class={cn("max-h-72 overflow-y-auto overscroll-contain", className)}
+	class={cn("max-h-72 overflow-y-auto overscroll-contain scrollbar-none", className)}
 	role="listbox"
 	tabindex="-1"
 >
 	{@render children()}
 </div>
+
+<style>
+	.scrollbar-none {
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+	.scrollbar-none::-webkit-scrollbar {
+		display: none;
+	}
+</style>

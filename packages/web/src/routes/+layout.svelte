@@ -9,10 +9,14 @@ let { children } = $props()
 
 let drawerOpen = $state(false)
 
-const allItems = [...navigationItems, ...externalLinks]
+const navItems = navigationItems
+const searchItems = [...navigationItems, ...externalLinks]
 
 function handleGlobalKeydown(e: KeyboardEvent) {
 	const isMod = e.metaKey || e.ctrlKey
+	const isOpen = registry.get(commandPaletteAtom).open
+
+	if (isOpen) return
 
 	if (isMod && e.key === "p") {
 		e.preventDefault()
@@ -46,5 +50,5 @@ function handleGlobalKeydown(e: KeyboardEvent) {
 	<Footer />
 </div>
 
-<CommandPalette items={allItems} />
+<CommandPalette {navItems} {searchItems} />
 <MobileDrawer bind:open={drawerOpen} />

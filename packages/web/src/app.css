@@ -48,6 +48,11 @@
 	--accent: oklch(0.907 0.083 3.174);
 	--accent-foreground: oklch(0.235 0.018 264.182);
 
+	--peach: oklch(0.838 0.128 62.986);
+	--mauve: oklch(0.762 0.152 304.987);
+	--green: oklch(0.839 0.134 143.537);
+	--mantle: oklch(0.214 0.017 264.182);
+
 	--destructive: oklch(0.701 0.161 15.355);
 	--destructive-foreground: oklch(0.235 0.018 264.182);
 
@@ -110,6 +115,11 @@
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
+
+	--color-peach: var(--peach);
+	--color-mauve: var(--mauve);
+	--color-green: var(--green);
+	--color-mantle: var(--mantle);
 
 	--font-sans: var(--font-sans);
 	--font-mono: var(--font-mono);

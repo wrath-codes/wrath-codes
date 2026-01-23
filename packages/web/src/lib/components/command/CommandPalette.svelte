@@ -1,95 +1,106 @@
 <script lang="ts">
-import { goto } from "$app/navigation"
-import { commandPaletteAtom, filterItems, groupItems, useWritableAtom } from "$lib/stores"
-import { cn } from "$lib/utils"
-import CommandEmpty from "./CommandEmpty.svelte"
-import CommandInput from "./CommandInput.svelte"
-import CommandItemRow from "./CommandItem.svelte"
-import CommandList from "./CommandList.svelte"
-import type { CommandItemData } from "./types"
+	import { goto } from "$app/navigation"
+	import { commandPaletteAtom, filterItems, groupItems, useWritableAtom } from "$lib/stores"
+	import { cn } from "$lib/utils"
+	import CommandEmpty from "./CommandEmpty.svelte"
+	import CommandInput from "./CommandInput.svelte"
+	import CommandItemRow from "./CommandItem.svelte"
+	import CommandList from "./CommandList.svelte"
+	import type { CommandItemData } from "./types"
 
-interface Props {
-	items?: CommandItemData[]
-	class?: string
-}
-
-let { items = [], class: className }: Props = $props()
-
-const palette = useWritableAtom(commandPaletteAtom)
-let inputRef: HTMLInputElement | null = $state(null)
-
-const filteredItems = $derived(filterItems(items, palette.value.query))
-const grouped = $derived(groupItems(filteredItems))
-
-$effect(() => {
-	if (palette.value.open && inputRef) {
-		inputRef.focus()
+	interface Props {
+		navItems?: CommandItemData[]
+		searchItems?: CommandItemData[]
+		class?: string
 	}
-})
 
-$effect(() => {
-	if (filteredItems.length > 0 && palette.value.selectedIndex >= filteredItems.length) {
-		palette.update((s) => ({ ...s, selectedIndex: filteredItems.length - 1 }))
+	let { navItems = [], searchItems = [], class: className }: Props = $props()
+
+	const palette = useWritableAtom(commandPaletteAtom)
+	let inputRef: HTMLInputElement | null = $state(null)
+
+	const isNavMode = $derived(palette.value.mode === "nav")
+	const currentItems = $derived(isNavMode ? navItems : searchItems)
+
+	const filteredItems = $derived(
+		isNavMode
+			? filterItems(currentItems, palette.value.query)
+			: palette.value.query.length > 0
+				? filterItems(currentItems, palette.value.query)
+				: []
+	)
+	const grouped = $derived(groupItems(filteredItems))
+	const showEmptySearch = $derived(!isNavMode && palette.value.query.length === 0)
+
+	$effect(() => {
+		if (palette.value.open && inputRef) {
+			inputRef.focus()
+		}
+	})
+
+	$effect(() => {
+		if (filteredItems.length > 0 && palette.value.selectedIndex >= filteredItems.length) {
+			palette.update((s) => ({ ...s, selectedIndex: filteredItems.length - 1 }))
+		}
+	})
+
+	function close() {
+		palette.set({ open: false, mode: "nav", query: "", selectedIndex: 0 })
 	}
-})
 
-function close() {
-	palette.set({ open: false, mode: "nav", query: "", selectedIndex: 0 })
-}
-
-function selectItem(item: CommandItemData) {
-	if (item.href) {
-		goto(item.href)
-	} else if (item.action) {
-		item.action()
-	}
-	close()
-}
-
-function handleKeydown(e: KeyboardEvent) {
-	if (!palette.value.open) return
-
-	switch (e.key) {
-		case "Escape":
-			e.preventDefault()
-			close()
-			break
-		case "ArrowDown":
-		case "j":
-			if (e.key === "j" && document.activeElement?.tagName === "INPUT") break
-			e.preventDefault()
-			palette.update((s) => ({
-				...s,
-				selectedIndex: Math.min(s.selectedIndex + 1, filteredItems.length - 1),
-			}))
-			break
-		case "ArrowUp":
-		case "k":
-			if (e.key === "k" && document.activeElement?.tagName === "INPUT") break
-			e.preventDefault()
-			palette.update((s) => ({
-				...s,
-				selectedIndex: Math.max(s.selectedIndex - 1, 0),
-			}))
-			break
-		case "Enter":
-			e.preventDefault()
-			if (filteredItems[palette.value.selectedIndex]) {
-				selectItem(filteredItems[palette.value.selectedIndex])
-			}
-			break
-	}
-}
-
-function handleBackdropClick(e: MouseEvent) {
-	if (e.target === e.currentTarget) {
+	function selectItem(item: CommandItemData) {
+		if (item.href) {
+			goto(item.href)
+		} else if (item.action) {
+			item.action()
+		}
 		close()
 	}
-}
 
-function handleQueryChange(query: string) {
-	palette.update((s) => ({ ...s, query, selectedIndex: 0 }))
-}
+	function handleKeydown(e: KeyboardEvent) {
+		if (!palette.value.open) return
+
+		switch (e.key) {
+			case "Escape":
+				e.preventDefault()
+				close()
+				break
+			case "ArrowDown":
+			case "j":
+				if (e.key === "j" && !e.ctrlKey && document.activeElement?.tagName === "INPUT") break
+				e.preventDefault()
+				palette.update((s) => ({
+					...s,
+					selectedIndex: Math.min(s.selectedIndex + 1, filteredItems.length - 1),
+				}))
+				break
+			case "ArrowUp":
+			case "k":
+				if (e.key === "k" && !e.ctrlKey && document.activeElement?.tagName === "INPUT") break
+				e.preventDefault()
+				palette.update((s) => ({
+					...s,
+					selectedIndex: Math.max(s.selectedIndex - 1, 0),
+				}))
+				break
+			case "Enter":
+				e.preventDefault()
+				if (filteredItems[palette.value.selectedIndex]) {
+					selectItem(filteredItems[palette.value.selectedIndex])
+				}
+				break
+		}
+	}
+
+	function handleBackdropClick(e: MouseEvent) {
+		if (e.target === e.currentTarget) {
+			close()
+		}
+	}
+
+	function handleQueryChange(query: string) {
+		palette.update((s) => ({ ...s, query, selectedIndex: 0 }))
+	}
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -111,12 +122,16 @@ function handleQueryChange(query: string) {
 		>
 			<CommandInput
 				value={palette.value.query}
-				placeholder={palette.value.mode === "nav" ? "Where to?" : "Search..."}
+				placeholder={isNavMode ? "Where to?" : "Search..."}
 				oninput={handleQueryChange}
 				bind:ref={inputRef}
 			/>
 			<CommandList>
-				{#if filteredItems.length === 0}
+				{#if showEmptySearch}
+					<div class="py-6 text-center text-sm text-muted-foreground">
+						Type to search...
+					</div>
+				{:else if filteredItems.length === 0}
 					<CommandEmpty />
 				{:else}
 					{#each Object.entries(grouped) as [group, groupItems]}
