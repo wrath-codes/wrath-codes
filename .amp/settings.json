@@ -1,0 +1,40 @@
+{
+  "amp.toolbox.path": "~/.config/amp/tools",
+  "amp.dangerouslyAllowAll": true,
+  "amp.tryOpus": true,
+  "amp.experimental.tools": [
+    "codemod"
+  ],
+  "amp.experimental.modes": [
+    "bombadil"
+  ],
+  "amp.git.commit.ampThread.enabled": true,
+  "amp.git.commit.coauthor.enabled": true,
+  "amp.guardedFiles.allowlist": {
+    ".env": true
+  },
+  "amp.internal.visibleModes": [],
+  "amp.notifications.enabled": true,
+  "amp.notifications.system.enabled": true,
+  "amp.permissions": [],
+  "amp.mcpPermissions": [],
+  "amp.tools.disable": [],
+  "amp.updates.mode": "auto",
+  "amp.mcpServers": {
+    "ref": {
+      "url": "https://api.ref.tools/mcp?apiKey=ref-5b97ef71875f72153b3d"
+    },
+    "duckdb": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-motherduck",
+        "--db-path",
+        ":memory:",
+        "--read-write",
+        "--allow-switch-databases"
+      ]
+    }
+  },
+  "amp.terminal.theme": "terminal",
+  "amp.skills.path": "~/.config/amp/skills/"
+}

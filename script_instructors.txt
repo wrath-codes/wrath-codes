@@ -1,0 +1,295 @@
+
+I need a Python algorithm that connects to a PostgreSQL database to insert information into tables according to a JSON payload:
+
+host: 189.126.111.30
+port: 5434
+Username: user_dev
+Password: gRup0gTs&dEv@O%k
+
+Below is an example of a JSON object that may or may not be inside an array containing other similar JSON objects:
+
+```json
+{
+  "cns": "09.277-5",
+  "dadosCartorio": {
+    "denominacao": "RCPN DO 1� DISTRITO DE ANGRA DOS REIS"
+  },
+  "atribuicoes": [
+    {
+      "codigo": 3,
+      "atribuicao": "REGISTRO CIVIL DAS PESSOAS NATURAIS"
+    },
+    {
+      "codigo": 5,
+      "atribuicao": "REGISTRO DE IM�VEIS"
+    },
+    {
+      "codigo": 6,
+      "atribuicao": "REGISTRO DE T�TULOS E DOCUMENTOS"
+    },
+    {
+      "codigo": 7,
+      "atribuicao": "REGISTRO CIVIS DAS PESSOAS JUR�DICAS"
+    },
+    {
+      "codigo": 10,
+      "atribuicao": "INTERDI��ES E TUTELAS"
+    }
+  ],
+  "responsaveis": [
+    {
+      "responsavel": "MATHEUS FARIA CARNEIRO",
+      "substituto": "ROSENI DE LUCENA MEDEIROS"
+    }
+  ],
+  "endereco": {
+    "logradouro": "RUA",
+    "endereco": "DA CONCEI��O",
+    "numero": "231",
+    "complemento": "",
+    "bairro": "CENTRO",
+    "municipio": "ANGRA DOS REIS",
+    "municipio_ibge": "3300100",
+    "estado": "RJ",
+    "cep": "23900437"
+  },
+  "contato": {
+    "telefonePrincipal": "2433654979",
+    "eMail": "rcpn01angra@gmail.com"
+  }
+}
+```
+
+1st - Look up `id_pessoa` and `id_pessoa_juridica` using this query, and store `id_pessoa`, `cns`, `id_pessoa_juridica`, `id_serventia`, and `codigo_tj` in a dictionary:
+
+```sql
+SELECT 
+    pda.id_pessoa,
+    pda.descricao,
+    pj.id_pessoa_juridica
+FROM global.pessoas_dados_adicionais pda
+INNER JOIN global.pessoas_juridicas pj on pj.id_pessoa on pda.id_pessoa
+                                                               and pj.situacao = pda.situacao
+Where 
+    pda.id_pessoa_dado_adicional_tipo = 2
+    and pda.descricao = '{CNS_FROM_JSON}'
+    and pda.situacao = 1
+```
+
+And to get `id_serventia` and `codigo_tj`:
+
+```sql
+SELECT 
+    s.id_serventia,
+    s.codigo_tj
+FROM global.serventias s
+where s.codigo_cns = '{CNS_FROM_JSON}'
+and s.situacao = 1
+```
+
+2nd - For each CNS, add its addresses into `pessoas_enderecos`. This is the table DDL:
+
+```sql
+CREATE TABLE IF NOT EXISTS global.pessoas_enderecos
+(
+    id_pessoa_endereco bigint NOT NULL DEFAULT nextval('global.pessoas_enderecos_id_pessoa_endereco_seq'::regclass),
+    id_pessoa bigint NOT NULL,
+    id_pessoa_endereco_tipo bigint NOT NULL,
+    logradouro character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    endereco character varying(150) COLLATE pg_catalog."default" NOT NULL,
+    numero character varying(50) COLLATE pg_catalog."default",
+    complemento character varying(50) COLLATE pg_catalog."default",
+    bairro character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    municipio character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    municipio_ibge character varying(50) COLLATE pg_catalog."default",
+    estado character varying(2) COLLATE pg_catalog."default" NOT NULL,
+    cep character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    situacao integer NOT NULL DEFAULT 1,
+    motivo character varying(500) COLLATE pg_catalog."default",
+    created_at timestamp(0) without time zone NOT NULL DEFAULT now(),
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT pessoas_enderecos_pkey PRIMARY KEY (id_pessoa_endereco),
+    CONSTRAINT fk_pessoas_enderecos_pessoas FOREIGN KEY (id_pessoa)
+        REFERENCES global.pessoas (id_pessoa) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+```
+
+Where `id_pessoa` must be the one from the dictionary according to the CNS.
+`id_pessoa_endereco_tipo` must always be `3`.
+`situacao` must always be `1`.
+If the query does not return `id_pessoa` but does return `id_serventia`, skip this step.
+
+3rd - It must create the contacts in `pessoas_contatos`. This is the table DDL:
+
+```sql
+CREATE TABLE IF NOT EXISTS global.pessoas_contatos
+(
+    id_pessoa_contato bigint NOT NULL DEFAULT nextval('global.pessoas_contatos_id_pessoa_contato_seq'::regclass),
+    id_pessoa_contato_tipo bigint NOT NULL,
+    id_pessoa bigint NOT NULL,
+    descricao character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    situacao integer NOT NULL DEFAULT 1,
+    motivo character varying(500) COLLATE pg_catalog."default",
+    created_at timestamp(0) without time zone NOT NULL DEFAULT now(),
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT pessoas_contatos_pkey PRIMARY KEY (id_pessoa_contato),
+    CONSTRAINT fk_pessoas_contatos_pessoas FOREIGN KEY (id_pessoa)
+        REFERENCES global.pessoas (id_pessoa) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+```
+
+Where `id_pessoa` must be the one from the dictionary according to the CNS.
+The contact must be saved as follows:
+
+* if there is a phone number, insert one row with:
+
+  * `id_pessoa_contato_tipo = 4`
+  * `descricao` = the phone number without formatting, only digits
+* if there is an email, insert one row with:
+
+  * `id_pessoa_contato_tipo = 1`
+  * `descricao` = the email
+
+If the query does not return `id_pessoa` but does return `id_serventia`, skip this step.
+
+4th - It must save the assignments in the `serventias_atribuicoes` table, whose DDL is:
+
+```sql
+CREATE TABLE IF NOT EXISTS global.serventias_atribuicoes
+(
+    id_serventia_atribuicao bigint NOT NULL DEFAULT nextval('global.serventias_atribuicoes_id_serventia_atribuicao_seq'::regclass),
+    id_serventia bigint NOT NULL,
+    id_atribuicao bigint NOT NULL,
+    situacao integer NOT NULL DEFAULT 1,
+    motivo character varying(500) COLLATE pg_catalog."default",
+    created_at timestamp(0) without time zone NOT NULL DEFAULT now(),
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT serventias_atribuicoes_pkey PRIMARY KEY (id_serventia_atribuicao)
+)
+```
+
+Where `id_serventia = id_serventia` from the dictionary.
+`id_atribuicao` must be based on the `codigo` inside `atribuicoes`.
+`situacao` must be `1`.
+This step is mandatory for all records.
+
+5th - It must now save the employees for each person in `responsaveis`. For that, it must create a row in `pessoas`:
+
+```sql
+CREATE TABLE IF NOT EXISTS global.pessoas
+(
+    id_pessoa bigint NOT NULL DEFAULT nextval('global.pessoas_id_pessoa_seq'::regclass),
+    id_pessoa_tipo bigint NOT NULL,
+    id_pessoa_origem bigint NOT NULL,
+    pessoa integer NOT NULL DEFAULT 0,
+    codigo character varying(20) COLLATE pg_catalog."default",
+    chave character varying(512) COLLATE pg_catalog."default",
+    senha character varying(150) COLLATE pg_catalog."default",
+    situacao integer NOT NULL DEFAULT 1,
+    motivo character varying(500) COLLATE pg_catalog."default",
+    created_at timestamp(0) without time zone NOT NULL DEFAULT now(),
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT pessoas_pkey PRIMARY KEY (id_pessoa)
+)
+```
+
+Where:
+
+* `id_pessoa_origem = 2`
+* `id_pessoa_tipo = 6`
+* `pessoa = 0`
+
+Then get the `id_pessoa` from that insert and add it into `pessoas_fisicas`:
+
+```sql
+CREATE TABLE IF NOT EXISTS global.pessoas_fisicas
+(
+    id_pessoa_fisica bigint NOT NULL DEFAULT nextval('global.pessoas_fisicas_id_pessoa_fisica_seq'::regclass),
+    id_pessoa bigint NOT NULL,
+    id_pessoa_genero bigint NOT NULL,
+    id_pessoa_estado_civil bigint NOT NULL,
+    cpf_justificativa integer NOT NULL DEFAULT 0,
+    cpf character varying(50) COLLATE pg_catalog."default",
+    nome_registro character varying(150) COLLATE pg_catalog."default" NOT NULL,
+    nome_social character varying(150) COLLATE pg_catalog."default",
+    doc_numero character varying(50) COLLATE pg_catalog."default",
+    doc_emissor character varying(50) COLLATE pg_catalog."default",
+    doc_data_emissao date,
+    nacionalidade character varying(30) COLLATE pg_catalog."default",
+    naturalidade character varying(30) COLLATE pg_catalog."default",
+    data_nascimento date,
+    situacao integer NOT NULL DEFAULT 1,
+    motivo character varying(500) COLLATE pg_catalog."default",
+    created_at timestamp(0) without time zone NOT NULL DEFAULT now(),
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT pessoas_fisicas_pkey PRIMARY KEY (id_pessoa_fisica)
+)
+```
+
+Where:
+
+* `id_pessoa = id_pessoa` from the previous insert
+* `id_pessoa_genero = 1`
+* `id_pessoa_estado_civil = 1`
+* `cpf_justificativa = 1`
+* `nome_registro = Value of "responsavel"` or `"substituto"` depending on who is being inserted
+* `situacao = 1`
+
+Right after that, it must create a row in `pessoas_juridicas_fisicas`:
+
+```sql
+CREATE TABLE IF NOT EXISTS global.pessoas_juridicas_fisicas
+(
+    id_pessoa_juridica_fisica bigint NOT NULL DEFAULT nextval('global.pessoas_juridicas_fisicas_id_pessoa_juridica_fisica_seq'::regclass),
+    id_pessoa_juridica bigint NOT NULL,
+    id_pessoa_fisica bigint NOT NULL,
+    id_pessoa_juridica_perfil bigint NOT NULL,
+    juridica_principal integer DEFAULT 0,
+    situacao integer NOT NULL DEFAULT 1,
+    motivo character varying(500) COLLATE pg_catalog."default",
+    created_at timestamp(0) without time zone NOT NULL DEFAULT now(),
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT pessoas_juridicas_fisicas_pkey PRIMARY KEY (id_pessoa_juridica_fisica)
+)
+```
+
+Where:
+
+* `id_pessoa_juridica = id_pessoa_juridica` from the dictionary
+* `id_pessoa_fisica = the id inserted in the previous insert`
+* `id_pessoa_juridica_perfil = 3`
+* `juridica_principal = 0`
+* `situacao = 1`
+
+Right after that, it must insert into `pessoas_fisicas_qualificacoes`:
+
+```sql
+CREATE TABLE IF NOT EXISTS global.pessoas_fisicas_qualificacoes
+(
+    id_pessoa_fisica_qualificacao bigint NOT NULL DEFAULT nextval('global.pessoas_fisicas_qualificacoes_id_pessoa_fisica_qualificacao_seq'::regclass),
+    id_pessoa_juridica_cartorio bigint NOT NULL DEFAULT '-1'::integer,
+    id_pessoa_fisica_funcionario bigint NOT NULL DEFAULT '-1'::integer,
+    id_pessoa_qualificacao bigint NOT NULL DEFAULT '-1'::integer,
+    situacao integer NOT NULL DEFAULT 1,
+    motivo character varying(500) COLLATE pg_catalog."default",
+    created_at timestamp(0) without time zone NOT NULL DEFAULT now(),
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT pessoas_fisicas_qualificacoes_pkey PRIMARY KEY (id_pessoa_fisica_qualificacao)
+)
+```
+
+Where:
+
+* `id_pessoa_juridica_cartorio = id_pessoa_juridica` from the dictionary
+* `id_pessoa_fisica_funcionario = id_pessoa_fisica` from the previous insert
+* `id_pessoa_qualificacao = 1` if registering `responsavel`, or `5` if registering `substituto`
+
+If the query does not return `id_pessoa` but does return `id_serventia`, skip this step.
+
+End.
+
+Create a console progress bar and logs.

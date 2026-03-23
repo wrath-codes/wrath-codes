@@ -1,0 +1,13 @@
+[project]
+name = "protesto-out"
+version = "0.1.0"
+description = "Protesto system DBF exploration and export tool"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "klaw-dbase>=0.1.2",
+    "polars>=1.0,<1.39",
+    "duckdb>=1.0",
+    "psycopg2>=2.9.11",
+    "tqdm>=4.67.3",
+]
