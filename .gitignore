@@ -153,3 +153,4 @@ out/
 *.duckdb
 parquet/
 packages/
+firebird_database/
