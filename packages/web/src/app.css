@@ -1,9 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@fontsource/geist-sans/400.css";
-@import "@fontsource/geist-sans/500.css";
-@import "@fontsource/geist-sans/600.css";
-@import "@fontsource/geist-sans/700.css";
 @import "@fontsource/geist-mono/400.css";
 @import "@fontsource/geist-mono/500.css";
 @import "@fontsource/geist-mono/600.css";
@@ -18,22 +14,24 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Catppuccin Mocha Theme */
+/* Catppuccin Mocha Theme - TUI Style */
 :root {
-	--font-sans: "Geist Sans", system-ui, sans-serif;
+	--font-sans: "Geist Mono", ui-monospace, monospace;
 	--font-mono: "Geist Mono", ui-monospace, monospace;
 	--font-icons: "Symbols Nerd Font";
 
-	--radius: 0.5rem;
+	/* No border radius - terminal style */
+	--radius: 0;
 
 	/* Catppuccin Mocha - Dark mode by default */
-	--background: oklch(0.235 0.018 264.182);
+	--background: oklch(0.178 0.015 264.182);
+	/* crust */
 	--foreground: oklch(0.899 0.016 285.885);
 
-	--card: oklch(0.279 0.019 263.293);
+	--card: oklch(0.235 0.018 264.182);
 	--card-foreground: oklch(0.899 0.016 285.885);
 
-	--popover: oklch(0.279 0.019 263.293);
+	--popover: oklch(0.235 0.018 264.182);
 	--popover-foreground: oklch(0.899 0.016 285.885);
 
 	--primary: oklch(0.762 0.152 304.987);
@@ -48,10 +46,11 @@
 	--accent: oklch(0.907 0.083 3.174);
 	--accent-foreground: oklch(0.235 0.018 264.182);
 
-	--peach: oklch(0.838 0.128 62.986);
+	--lavender: oklch(0.820 0.095 288.708);
 	--mauve: oklch(0.762 0.152 304.987);
-	--green: oklch(0.839 0.134 143.537);
+	--blue: oklch(0.775 0.105 254.027);
 	--mantle: oklch(0.214 0.017 264.182);
+	--crust: oklch(0.178 0.015 264.182);
 
 	--destructive: oklch(0.701 0.161 15.355);
 	--destructive-foreground: oklch(0.235 0.018 264.182);
@@ -79,10 +78,11 @@
 }
 
 @theme inline {
-	--radius-sm: calc(var(--radius) - 4px);
-	--radius-md: calc(var(--radius) - 2px);
-	--radius-lg: var(--radius);
-	--radius-xl: calc(var(--radius) + 4px);
+	/* All radius set to 0 for terminal look */
+	--radius-sm: 0;
+	--radius-md: 0;
+	--radius-lg: 0;
+	--radius-xl: 0;
 
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
@@ -116,10 +116,11 @@
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
 
-	--color-peach: var(--peach);
+	--color-lavender: var(--lavender);
 	--color-mauve: var(--mauve);
-	--color-green: var(--green);
+	--color-blue: var(--blue);
 	--color-mantle: var(--mantle);
+	--color-crust: var(--crust);
 
 	--font-sans: var(--font-sans);
 	--font-mono: var(--font-mono);
@@ -129,15 +130,39 @@
 	* {
 		@apply border-border outline-ring/50;
 	}
+
 	body {
 		@apply bg-background text-foreground;
-		font-family: var(--font-sans);
-	}
-	code,
-	pre,
-	kbd {
 		font-family: var(--font-mono);
-		font-variant-ligatures: common-ligatures;
-		font-feature-settings: "liga" 1, "calt" 1;
+		font-size: 14px;
+		line-height: 1.6;
+	}
+
+	/* Everything is monospace in TUI */
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p,
+	span,
+	a,
+	button,
+	input,
+	textarea,
+	label {
+		font-family: var(--font-mono);
+	}
+}
+
+/* TUI utility classes */
+@layer utilities {
+	.tui-box {
+		@apply border border-border;
+	}
+
+	.tui-section {
+		@apply border-t border-border pt-4 mt-4;
 	}
 }

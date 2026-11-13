@@ -8,4 +8,4 @@ interface Props {
 let { class: className }: Props = $props()
 </script>
 
-<span class={cn("font-mono text-sm text-green transition-colors hover:text-peach", className)}>wrath.codes</span>
+<span class={cn("font-mono text-sm text-foreground transition-colors hover:text-lavender", className)}>wrath.codes</span>

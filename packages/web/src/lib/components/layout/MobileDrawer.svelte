@@ -39,7 +39,7 @@ function handleBackdropClick(e: MouseEvent) {
 
 {#if open}
 	<div
-		class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
+		class="fixed inset-0 z-50 bg-background/90"
 		onclick={handleBackdropClick}
 		onkeydown={handleKeydown}
 		role="dialog"
@@ -48,44 +48,41 @@ function handleBackdropClick(e: MouseEvent) {
 	>
 		<div
 			class={cn(
-				"fixed inset-y-0 left-0 z-50 h-full w-3/4 max-w-sm border-r border-border bg-background p-6 shadow-lg transition-transform",
+				"fixed inset-y-0 left-0 z-50 h-full w-3/4 max-w-sm border-r border-border bg-background p-4",
 				className
 			)}
 		>
-			<div class="flex items-center justify-between">
+			<div class="flex items-center justify-between border-b border-border pb-3">
 				<a href="/" class="flex items-center gap-2" onclick={() => close()}>
 					<Logo />
 					<SiteName />
 				</a>
 				<button
 					type="button"
-					class="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/10 hover:text-foreground"
+					class="flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
 					onclick={() => close()}
 					aria-label="Close menu"
 				>
-					<span style="font-family: var(--font-icons)" class="text-xl"></span>
+					<span style="font-family: var(--font-icons)" class="text-lg"></span>
 				</button>
 			</div>
 
-			<nav class="mt-8 flex flex-col gap-2">
+			<nav class="mt-4 flex flex-col">
+				<div class="text-xs text-muted-foreground mb-2">// navigation</div>
 				{#each navigationItems as item}
 					<button
 						type="button"
-						class="flex items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-accent/10"
+						class="flex items-center gap-2 px-2 py-1.5 text-left text-sm text-foreground transition-colors hover:bg-muted/30"
 						onclick={() => item.href && navigate(item.href)}
 					>
-						{#if item.nerd}
-							<span style="font-family: var(--font-icons)" class="text-muted-foreground">
-								{item.nerd}
-							</span>
-						{/if}
-						<span>{item.label}</span>
+						<span class="text-muted-foreground">></span>
+						<span>{item.label.toLowerCase()}</span>
 					</button>
 				{/each}
 			</nav>
 
-			<div class="absolute bottom-6 left-6">
-				<SocialLinks size="md" />
+			<div class="absolute bottom-4 left-4">
+				<SocialLinks size="sm" />
 			</div>
 		</div>
 	</div>

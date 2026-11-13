@@ -1,38 +1,45 @@
 <script lang="ts">
-	import type { Component } from "svelte"
-	import { cn } from "$lib/utils"
-	import Icon from "../common/Icon.svelte"
-	import Kbd from "../common/Kbd.svelte"
+	import type { Component } from "svelte";
+	import { cn } from "$lib/utils";
+	import Icon from "../common/Icon.svelte";
+	import Kbd from "../common/Kbd.svelte";
 
 	interface Props {
-		icon?: Component<{ class?: string }>
-		nerd?: string
-		label: string
-		shortcut?: string
-		selected?: boolean
-		onSelect?: () => void
-		class?: string
+		icon?: Component<{ class?: string }>;
+		nerd?: string;
+		label: string;
+		shortcut?: string;
+		selected?: boolean;
+		onSelect?: () => void;
+		class?: string;
 	}
 
-	let { icon, nerd, label, shortcut, selected = false, onSelect, class: className }: Props =
-		$props()
+	let {
+		icon,
+		nerd,
+		label,
+		shortcut,
+		selected = false,
+		onSelect,
+		class: className,
+	}: Props = $props();
 
-	let buttonRef: HTMLButtonElement | null = $state(null)
+	let buttonRef: HTMLButtonElement | null = $state(null);
 
 	$effect(() => {
 		if (selected && buttonRef) {
-			buttonRef.scrollIntoView({ block: "nearest", behavior: "smooth" })
+			buttonRef.scrollIntoView({ block: "nearest", behavior: "smooth" });
 		}
-	})
+	});
 
 	function handleClick() {
-		onSelect?.()
+		onSelect?.();
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === "Enter") {
-			e.preventDefault()
-			onSelect?.()
+			e.preventDefault();
+			onSelect?.();
 		}
 	}
 </script>
@@ -41,25 +48,28 @@
 	bind:this={buttonRef}
 	type="button"
 	class={cn(
-		"flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition-colors",
-		"hover:bg-mauve/10",
-		selected && "bg-mauve/20 text-peach",
-		className
+		"flex w-full cursor-pointer items-center gap-2 px-3 py-1.5 text-left text-sm transition-colors text-muted-foreground",
+		"hover:bg-muted/30",
+		selected && "bg-mauve/20 text-foreground",
+		className,
 	)}
 	onclick={handleClick}
 	onkeydown={handleKeydown}
 	data-selected={selected}
 >
 	{#if selected}
-		<span class="blinking-cursor text-peach">▌</span>
+		<span
+			style="font-family: var(--font-icons)"
+			class="blinking-cursor text-mauve">{"\uf44a"}</span
+		>
 	{:else if icon || nerd}
 		<Icon {icon} {nerd} size="sm" class="text-muted-foreground" />
 	{:else}
-		<span class="w-4"></span>
+		<span class="w-3"></span>
 	{/if}
 	<span class="flex-1">{label}</span>
 	{#if shortcut}
-		<Kbd>{shortcut}</Kbd>
+		<span class="text-xs text-muted-foreground">[{shortcut}]</span>
 	{/if}
 </button>
 

@@ -4,7 +4,20 @@ import { createHighlighter } from "shiki"
 
 const highlighter = await createHighlighter({
 	themes: ["catppuccin-mocha"],
-	langs: ["javascript", "typescript", "svelte", "bash", "json", "css", "html", "markdown", "rust", "python", "go", "lua"],
+	langs: [
+		"javascript",
+		"typescript",
+		"svelte",
+		"bash",
+		"json",
+		"css",
+		"html",
+		"markdown",
+		"rust",
+		"python",
+		"go",
+		"lua",
+	],
 })
 
 /** @type {import('@sveltejs/kit').Config} */

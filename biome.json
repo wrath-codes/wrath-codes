@@ -19,7 +19,9 @@
 		"rules": {
 			"recommended": true,
 			"correctness": {
-				"noUnusedVariables": "off"
+				"noUnusedVariables": "off",
+				"noUnusedImports": "off",
+				"useYield": "off"
 			},
 			"style": {
 				"useConst": "off"
